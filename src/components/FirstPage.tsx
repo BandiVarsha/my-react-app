@@ -1,5 +1,7 @@
+import AppUi from "../utils/AppUi";
+
 function FirstPage() {
-  return <div>FirstPage</div>;
+  return <AppUi />;
 }
 
 export default FirstPage;
