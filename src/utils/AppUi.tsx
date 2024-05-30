@@ -1,4 +1,4 @@
-import { AppBar, Avatar, Box, Toolbar } from "@mui/material";
+import { AppBar, Avatar, Toolbar } from "@mui/material";
 import { acc, first } from "../assets/index";
 
 function AppUi() {
@@ -10,9 +10,6 @@ function AppUi() {
           <Avatar src={acc} alt="acc" />
         </Toolbar>
       </AppBar>
-      <Box
-        sx={{ bgcolor: "#080924", width: "1900px", minHeight: "100vh" }}
-      ></Box>
     </>
   );
 }
