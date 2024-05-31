@@ -1,10 +1,10 @@
 import React from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import Calculate from "./components/Calculate";
 import FirstPage from "./components/FirstPage";
 
 import FlightEstimates from "./components/FlightEstimates";
 
+import Calculate from "./components/Calculate";
 import PreviousElectricity from "./components/PreviousElectricity";
 import { axios } from "./utils/axios";
 const App: React.FC = () => {
