@@ -4,13 +4,70 @@ import {
   Divider,
   MenuItem,
   Paper,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useMutation } from "react-query";
+import AppUi from "../utils/AppUi";
+import { axios } from "../utils/axios";
+
+interface EstimateResponse {
+  country: string;
+  state: string;
+  electricity_unit: string;
+  electricity_value: number;
+  estimated_at: string;
+  carbon_g: number;
+  carbon_lb: number;
+  carbon_kg: number;
+  carbon_mt: number;
+}
+
+interface FormData {
+  type: string;
+  electricity_unit: string;
+  electricity_value: number;
+  country: string;
+  state: string;
+}
 
 function Calculate() {
+  const { control, handleSubmit } = useForm<FormData>();
+  const [responseData, setResponseData] = useState<EstimateResponse | null>(
+    null
+  );
+
+  const mutation = useMutation(
+    async (formData: FormData) => {
+      const response = await axios.post("/estimates", formData);
+      return response.data.data.attributes;
+    },
+    {
+      onSuccess: (data) => {
+        setResponseData(data);
+      },
+      onError: (error) => {
+        console.error("Error fetching estimate:", error);
+      },
+    }
+  );
+
+  const onSubmit = (formData: FormData) => {
+    mutation.mutate({
+      ...formData,
+      electricity_value: Number(formData.electricity_value),
+    });
+  };
+  const onError = (err) => {
+    console.log(err, "error");
+  };
+
   return (
     <>
+      <AppUi />
       <Box
         sx={{
           backgroundColor: "#080924",
@@ -19,7 +76,6 @@ function Calculate() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-
           padding: "20px",
         }}
       >
@@ -40,116 +96,188 @@ function Calculate() {
             Calculate Carbon Emission
           </Typography>
           <Divider />
-          <TextField
-            select
-            label="Type"
-            variant="outlined"
-            fullWidth
-            SelectProps={{
-              MenuProps: {
-                PaperProps: {
-                  sx: {
-                    backgroundColor: "#1a1a2e",
-                    color: "white",
-                  },
-                },
-              },
-            }}
-          >
-            <MenuItem value="type">Estimate</MenuItem>
-          </TextField>
-          <TextField
-            select
-            label="Electricity Unit"
-            variant="outlined"
-            fullWidth
-            SelectProps={{
-              MenuProps: {
-                PaperProps: {
-                  sx: {
-                    backgroundColor: "#1a1a2e",
-                    color: "white",
-                  },
-                },
-              },
-            }}
-          >
-            <MenuItem value="mwh">mwh</MenuItem>
-            <MenuItem value="kwh">kwh</MenuItem>
-          </TextField>
+          <Box sx={{ display: "flex", flexDirection: "row", gap: "20px" }}>
+            <form onSubmit={handleSubmit(onSubmit, onError)}>
+              <Stack gap={"10px"} sx={{ width: "250px" }}>
+                <Controller
+                  name="type"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      select
+                      label="Type"
+                      variant="outlined"
+                      fullWidth
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: {
+                              backgroundColor: "#1a1a2e",
+                              color: "white",
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="electricity">Electricity</MenuItem>
+                    </TextField>
+                  )}
+                />
+                <Controller
+                  name="electricity_unit"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      select
+                      label="Electricity Unit"
+                      variant="outlined"
+                      fullWidth
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: {
+                              backgroundColor: "#1a1a2e",
+                              color: "white",
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="mwh">mwh</MenuItem>
+                      <MenuItem value="kwh">kwh</MenuItem>
+                    </TextField>
+                  )}
+                />
+                <Controller
+                  name="electricity_value"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Electricity Value"
+                      variant="outlined"
+                      fullWidth
+                      type="number"
+                    />
+                  )}
+                />
+                <Controller
+                  name="country"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      select
+                      label="Country"
+                      variant="outlined"
+                      fullWidth
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: {
+                              backgroundColor: "#1a1a2e",
+                              color: "white",
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="us">US</MenuItem>
+                    </TextField>
+                  )}
+                />
+                <Controller
+                  name="state"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      select
+                      label="State"
+                      variant="outlined"
+                      fullWidth
+                      SelectProps={{
+                        MenuProps: {
+                          PaperProps: {
+                            sx: {
+                              backgroundColor: "#1a1a2e",
+                              color: "white",
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="fl">Florida</MenuItem>
+                    </TextField>
+                  )}
+                />
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    backgroundColor: "#4a4a4a",
+                    "&:hover": {
+                      backgroundColor: "#ffffff",
+                      color: "#000000",
+                    },
+                  }}
+                  type="submit"
+                >
+                  Submit
+                </Button>
+              </Stack>
+            </form>
 
-          <TextField label="Electricity Value" variant="outlined" fullWidth />
-          <TextField
-            select
-            label="Country"
-            variant="outlined"
-            fullWidth
-            SelectProps={{
-              MenuProps: {
-                PaperProps: {
-                  sx: {
-                    backgroundColor: "#1a1a2e",
-                    color: "white",
-                  },
-                },
-              },
-            }}
-          >
-            <MenuItem value="us">US</MenuItem>
-          </TextField>
-          <TextField
-            select
-            label="State"
-            variant="outlined"
-            fullWidth
-            SelectProps={{
-              MenuProps: {
-                PaperProps: {
-                  sx: {
-                    backgroundColor: "#1a1a2e",
-                    color: "white",
-                  },
-                },
-              },
-            }}
-          >
-            <MenuItem value="fl">Florida</MenuItem>
-          </TextField>
-          <Button
-            variant="contained"
-            fullWidth
-            sx={{
-              backgroundColor: "#4a4a4a",
-              "&:hover": {
-                backgroundColor: "#ffffff",
-                color: "#000000",
-              },
-            }}
-          >
-            Submit
-          </Button>
-
-          <Paper
-            elevation={3}
-            sx={{
-              backgroundColor: "#0d0d2b",
-              padding: "20px",
-              borderRadius: "8px",
-              color: "#ffffff",
-            }}
-          >
-            <Typography variant="body1">ESTIMATE RESPONSE</Typography>
-            <Typography variant="body2">Country: </Typography>
-            <Typography variant="body2">State:</Typography>
-            <Typography variant="body2">Electricity Unit: </Typography>
-            <Typography variant="body2">Electricity Value:</Typography>
-            <Typography variant="body2">Estimated At:</Typography>
-            <Typography variant="body2" color="error">
-              Carbon (In gms):
-            </Typography>
-            <Typography variant="body2">Carbon (In lb): </Typography>
-            <Typography variant="body2">Carbon (In Kg):</Typography>
-          </Paper>
+            {responseData && (
+              <Paper
+                elevation={3}
+                sx={{
+                  backgroundColor: "white",
+                  padding: "20px",
+                  borderRadius: "8px",
+                  width: "800px",
+                  color: "black",
+                }}
+              >
+                <Typography variant="body1">ESTIMATE RESPONSE</Typography>
+                <Divider />
+                <Typography variant="body2">
+                  Country: {responseData.country}
+                </Typography>
+                <Typography variant="body2">
+                  State: {responseData.state}
+                </Typography>
+                <Typography variant="body2">
+                  Electricity Unit: {responseData.electricity_unit}
+                </Typography>
+                <Typography variant="body2">
+                  Electricity Value: {responseData.electricity_value}
+                </Typography>
+                <Typography variant="body2">
+                  Estimated At:{" "}
+                  {new Date(responseData.estimated_at).toLocaleString()}
+                </Typography>
+                <Typography variant="body2" color="error">
+                  Carbon (In gms): {responseData.carbon_g}
+                </Typography>
+                <Typography variant="body2">
+                  Carbon (In lb): {responseData.carbon_lb}
+                </Typography>
+                <Typography variant="body2">
+                  Carbon (In Kg): {responseData.carbon_kg}
+                </Typography>
+                <Typography variant="body2">
+                  Carbon (In metric tons): {responseData.carbon_mt}
+                </Typography>
+              </Paper>
+            )}
+          </Box>
         </Box>
       </Box>
     </>
