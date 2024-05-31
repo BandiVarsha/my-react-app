@@ -12,10 +12,19 @@ import {
 import { useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Controller, useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { QueryClient, QueryClientProvider, useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import AppUi from "../utils/AppUi";
 import { axios } from "../utils/axios";
+const queryClient = new QueryClient();
+
+function Calculate() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Response />
+    </QueryClientProvider>
+  );
+}
 
 interface EstimateResponse {
   country: string;
@@ -37,7 +46,7 @@ interface FormData {
   state: string;
 }
 
-function Calculate() {
+function Response() {
   const { control, handleSubmit } = useForm<FormData>();
   const [responseData, setResponseData] = useState<EstimateResponse | null>(
     null

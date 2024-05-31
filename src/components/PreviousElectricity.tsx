@@ -10,9 +10,18 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { useQuery } from "react-query";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import AppUi from "../utils/AppUi";
 import { axios } from "../utils/axios";
+const queryClient = new QueryClient();
+
+function PreviousElectricity() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <PreviousData />
+    </QueryClientProvider>
+  );
+}
 
 interface EstimateAttributes {
   country?: string;
@@ -49,7 +58,7 @@ const fetchElectricityData = async () => {
   return electricityData;
 };
 
-const PreviousElectricity: React.FC = () => {
+const PreviousData: React.FC = () => {
   const {
     data: electricityData,
     isLoading,
