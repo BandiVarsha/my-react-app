@@ -1,3 +1,4 @@
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Button,
@@ -9,8 +10,10 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
+import { useNavigate } from "react-router-dom";
 import AppUi from "../utils/AppUi";
 import { axios } from "../utils/axios";
 
@@ -39,6 +42,7 @@ function Calculate() {
   const [responseData, setResponseData] = useState<EstimateResponse | null>(
     null
   );
+  const navigate = useNavigate();
 
   const mutation = useMutation(
     async (formData: FormData) => {
@@ -63,6 +67,9 @@ function Calculate() {
   };
   const onError = (err) => {
     console.log(err, "error");
+  };
+  const handleNavigateBack = () => {
+    navigate("/");
   };
 
   return (
@@ -92,9 +99,19 @@ function Calculate() {
             color: "#ffffff",
           }}
         >
-          <Typography variant="h6" component="div" sx={{ color: "black" }}>
-            Calculate Carbon Emission
-          </Typography>
+          <Stack direction={"row"} sx={{ gap: "200px" }}>
+            <Typography variant="h6" sx={{ color: "black" }}>
+              Calculate Carbon Emission
+            </Typography>
+            <CloseIcon
+              sx={{
+                cursor: "pointer",
+                color: "black",
+                mt: "5px",
+              }}
+              onClick={handleNavigateBack}
+            />
+          </Stack>
           <Divider />
           <Box sx={{ display: "flex", flexDirection: "row", gap: "20px" }}>
             <form onSubmit={handleSubmit(onSubmit, onError)}>
@@ -275,6 +292,14 @@ function Calculate() {
                 <Typography variant="body2">
                   Carbon (In metric tons): {responseData.carbon_mt}
                 </Typography>
+                <CopyToClipboard
+                  text={JSON.stringify(responseData, null, 2)}
+                  onCopy={() => alert("Copied to clipboard")}
+                >
+                  <Button variant="contained" sx={{ mt: "40px" }}>
+                    Copy to Clipboard
+                  </Button>
+                </CopyToClipboard>
               </Paper>
             )}
           </Box>
